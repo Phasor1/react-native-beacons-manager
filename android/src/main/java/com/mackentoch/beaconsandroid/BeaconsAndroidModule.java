@@ -54,6 +54,7 @@ public class BeaconsAndroidModule extends ReactContextBaseJavaModule implements 
         // this.bA.disable();
         // Detect iBeacons ( http://stackoverflow.com/questions/25027983/is-this-the-correct-layout-to-detect-ibeacons-with-altbeacons-android-beacon-li )
         addParser("m:0-3=4c000215,i:4-19,i:20-21,i:22-23,p:24-24");
+        mBeaconManager.setEnableScheduledScanJobs(false);
         mBeaconManager.bind(this);
     }
 
@@ -82,6 +83,7 @@ public class BeaconsAndroidModule extends ReactContextBaseJavaModule implements 
 
     @ReactMethod
     public void addParser(String parser) {
+        mBeaconManager.getBeaconParsers().clear();
         mBeaconManager.getBeaconParsers().add(new BeaconParser().setBeaconLayout(parser));
     }
 
@@ -210,7 +212,9 @@ public class BeaconsAndroidModule extends ReactContextBaseJavaModule implements 
               String.valueOf(minor).equals("-1") ? "" : String.valueOf(minor),
               String.valueOf(major).equals("-1") ? "" : String.valueOf(major)
             );
+            mBeaconManager.setRegionStatePeristenceEnabled(false);
             mBeaconManager.startMonitoringBeaconsInRegion(region);
+            mBeaconManager.updateScanPeriods();
             resolve.invoke();
         } catch (Exception e) {
             Log.e(LOG_TAG, "startMonitoring, error: ", e);
